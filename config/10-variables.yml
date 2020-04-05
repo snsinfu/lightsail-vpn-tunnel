@@ -1,0 +1,12 @@
+infra:
+  terraform_s3_bucket: # secret
+  terraform_s3_key: lightsail-vpn-tunnel/tfstate
+  server_name: tunnel.example.com
+  server_zone: ap-northeast-1a
+  server_bundle: nano_2_0
+  server_blueprint: debian_9_5
+
+admin_user: ansible
+admin_password: # secret
+admin_password_salt: # secret
+admin_public_keys: # secret
