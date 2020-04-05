@@ -1,5 +1,31 @@
 # VPN tunneling via Amazon Lightsail
 
+Establish a wireguard tunnel between your home and a site behind NAT. User can
+access `Server 1a` and `Server 1b` that are internal to `Site 1` from home
+network. There can be multiple sites and multipler users.
+
+```
+      Site 1                         Lightsail                         Home
+===================             ===================                 ==========
+
+ +-----------+                   +---------------+                   +------+
+ | Gateway 1 |---[ wireguard ]---| Tunnel server |---[ wireguard ]---| User |
+ +-----------+                   +---------------+                   +------+
+  |      |
+  |      V
+  |  +-----------+
+  |  | Server 1a |
+  |  +-----------+
+  |
+  V
+ +-----------+
+ | Server 1b |
+ +-----------+
+```
+
+This repository contains code for deploying `Tunnel server` in the diagram.
+
+
 ## Project structure
 
 ```
