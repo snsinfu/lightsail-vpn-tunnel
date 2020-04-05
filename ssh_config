@@ -1,0 +1,4 @@
+Compression yes
+ControlMaster auto
+ControlPersist 180s
+UserKnownHostsFile _known_hosts

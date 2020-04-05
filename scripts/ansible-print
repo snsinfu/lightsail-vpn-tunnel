@@ -1,0 +1,21 @@
+#!/bin/sh -eu
+
+host="localhost"
+
+while getopts t: opt; do
+    case ${opt} in
+    t)  host="${OPTARG}"
+        ;;
+    ?)  exit 1
+    esac
+done
+
+shift $((OPTIND - 1))
+
+template="$1"
+
+export ANSIBLE_LOAD_CALLBACK_PLUGINS=True
+export ANSIBLE_STDOUT_CALLBACK=json
+
+ansible -c local -m debug -a msg="${template}" "${host}" |
+jq -r ".plays[0].tasks[0].hosts | to_entries[0].value.msg | @text"
