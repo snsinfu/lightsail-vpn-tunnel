@@ -5,12 +5,12 @@ access `Server 1a` and `Server 1b` that are internal to `Site 1` from home
 network. There can be multiple sites and multipler users.
 
 ```
-      Site 1                         Lightsail                         Home
-===================             ===================                 ==========
+      Site 1                        Lightsail                         Home
+===================             ==================                 ==========
 
- +-----------+                   +---------------+                   +------+
- | Gateway 1 |---[ wireguard ]---| Tunnel server |---[ wireguard ]---| User |
- +-----------+                   +---------------+                   +------+
+ +-----------+                   +--------------+                   +------+
+ | Gateway 1 |---[ wireguard ]---| Relay server |---[ wireguard ]---| User |
+ +-----------+                   +--------------+                   +------+
   |      |
   |      V
   |  +-----------+
@@ -23,7 +23,7 @@ network. There can be multiple sites and multipler users.
  +-----------+
 ```
 
-This repository contains code for deploying `Tunnel server` in the diagram.
+This repository contains code for deploying `Relay server` in the diagram.
 
 
 ## Technical details
@@ -31,7 +31,7 @@ This repository contains code for deploying `Tunnel server` in the diagram.
 ### Project structure
 
 Terraform deploys a Lightsail server instance and Ansible provisions the
-server as a wireguard tunnel server. Terraform and Ansible variables are
+server as a wireguard relay server. Terraform and Ansible variables are
 centralized in the `config` directory. Makefile integrates everything.
 
 ```
