@@ -26,10 +26,20 @@ network. There can be multiple sites and multipler users.
 This repository contains code for deploying `Tunnel server` in the diagram.
 
 
-## Project structure
+## Technical details
+
+### Project structure
+
+Terraform deploys a Lightsail server instance and Ansible provisions the
+server as a wireguard tunnel server. Terraform and Ansible variables are
+centralized in the `config` directory. Makefile integrates everything.
 
 ```
 /
+ |
+ +-- config/                      Project configuration
+ |    +-- 10-variables.yml        General configurations
+ |    +-- 20-secrets.yml          Sensitive configurations (such as password)
  |
  +-- terraform/                   Infrastructure definitions
  |    |
@@ -42,10 +52,6 @@ This repository contains code for deploying `Tunnel server` in the diagram.
  |    +-- main.tf
  |    +-- variables.tf
  |    +-- outputs.tf
- |
- +-- config/                      Project configuration
- |    +-- 10-variables.yml        General configurations
- |    +-- 20-secrets.yml          Sensitive configurations (such as password)
  |
  +-- ansible/
  |    |
