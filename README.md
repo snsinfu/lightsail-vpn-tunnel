@@ -25,6 +25,105 @@ network. There can be multiple sites and multipler users.
 
 This repository contains code for deploying `Relay server` in the diagram.
 
+- [Usage](#usage)
+- [Technical details](#technical-details)
+
+
+## Usage
+
+- [Requirements](#requirements)
+- [Configuration](#configuration)
+- [AWS configuration](#aws-configuration)
+- [Deploy](#deploy)
+
+### Requirements
+
+- AWS account
+- Terraform (>= 0.12)
+- Ansible (>= 2.9)
+- jq
+
+### Configuration
+
+Create `config/20-secrets.yml` with the following variables.
+
+```yaml
+infra:
+  terraform_s3_bucket: ... # Your S3 bucket to store Terraform state
+  server_zone: ap-northeast-1a # Relay server's AZ
+
+admin_password: ... # Admin user's password (used for sudo, not ssh)
+admin_password_salt: ... # Random salt string used to hash password
+admin_public_keys:
+  # Admin user's ssh public keys
+  - ssh-ed25519 AAAAC3Nza...
+  - ...
+```
+
+Some notes:
+
+- `server_zone` should be the nearest one to the tunneled sites.
+
+### AWS configuration
+
+Configure AWS account via environment variables:
+
+```
+AWS_DEFAULT_REGION=ap-northeast-1
+AWS_ACCESS_KEY_ID=...
+AWS_SECRET_ACCESS_KEY=...
+```
+
+Root account's access key works, but it is recommended to create a dedicated
+IAM user/group for this project. This project uses S3 for a state storage and
+Lightsail for a server, so the policy would look like this:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": "s3:ListBucket",
+      "Resource": "arn:aws:s3:::{{ BUCKET }}"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "s3:GetObject",
+        "s3:PutObject"
+      ],
+      "Resource": "arn:aws:s3:::{{ BUCKET }}/lightsail-vpn-tunnel/tfstate"
+    },
+    {
+      "Effect": "Allow",
+      "Action": "lightsail:*",
+      "Resource": "arn:aws:lightsail:*"
+    }
+  ]
+}
+```
+
+Replace `{{ BUCKET }}` with the S3 bucket ID set to `infra/terraform_s3_bucket`
+variable.
+
+### Deploy
+
+Type `make` in the project root directory:
+
+```console
+$ make
+```
+
+Instance takes some time to fully boot up, so Ansible can fail due to
+connection failure. In that case retry `make`.
+
+To destroy the server, use `destroy` and `clean` targets:
+
+```console
+$ make destroy clean
+```
+
 
 ## Technical details
 
@@ -79,48 +178,4 @@ centralized in the `config` directory. Makefile integrates everything.
  +-- Makefile                     Task runner
  +-- ansible.cfg                  Ansible config
  +-- .vaultpass                   Ansible Vault password file
-```
-
-## Configuration
-
-### Environemnt variables
-
-The terraform configuration uses S3 for a state storage and Lightsail for a
-server. Specify the access key/secret of an appropriate IAM user via
-environment variables (also default region needs to be specified):
-
-```
-AWS_DEFAULT_REGION=ap-northeast-1
-AWS_ACCESS_KEY_ID=...
-AWS_SECRET_ACCESS_KEY=...
-```
-
-### IAM policy
-
-`{{ BUCKET }}` is your S3 bucket.
-
-```json
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "s3:ListBucket",
-      "Resource": "arn:aws:s3:::{{ BUCKET }}"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:PutObject"
-      ],
-      "Resource": "arn:aws:s3:::{{ BUCKET }}/lightsail-vpn-tunnel/tfstate"
-    },
-    {
-      "Effect": "Allow",
-      "Action": "lightsail:*",
-      "Resource": "*"
-    }
-  ]
-}
 ```
