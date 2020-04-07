@@ -1,6 +1,7 @@
 # This is injected into Lightsail-provided startup shell script.
 
 timedatectl set-timezone UTC
+hostnamectl set-hostname ${hostname}
 
 # Remove lightsail-provided admin user.
 userdel -rf admin
