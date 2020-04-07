@@ -1,7 +1,5 @@
 # This is injected into Lightsail-provided startup shell script.
 
-timedatectl set-timezone UTC
-
 # Remove lightsail-provided admin user.
 userdel -rf admin
 
@@ -20,15 +18,6 @@ ${admin_authorized_keys}
 END
 umask 022
 chown -R ${admin_user}:${admin_user} /home/${admin_user}/.ssh
-
-# SSH
-cat > /etc/ssh/sshd_config << END
-PermitRootLogin no
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-UsePAM yes
-Subsystem sftp internal-sftp
-END
 
 # Lightsail's Debian uses a stale kernel. Update.
 export DEBIAN_FRONTEND=noninteractive
