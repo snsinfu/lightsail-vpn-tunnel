@@ -18,7 +18,6 @@
 # Lock down the server. Admin must ssh into the server via VPN.
 -A INPUT -j ACCEPT -i {{ wan_interface }} -p icmp
 -A INPUT -j ACCEPT -i {{ wan_interface }} -p udp --dport {{ wireguard_port }} -m state --state NEW
--A INPUT -j ACCEPT -i {{ wan_interface }} -p tcp --dport ssh -m state --state NEW
 -A INPUT -j DROP   -i {{ wan_interface }}
 
 # Allow management via VPN.
