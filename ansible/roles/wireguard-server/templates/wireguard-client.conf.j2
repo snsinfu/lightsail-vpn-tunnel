@@ -1,0 +1,18 @@
+[Interface]
+PrivateKey = {{ client.private_key | default("") }}
+Address = {{ wireguard_network | ipsubnet(32, client.host_id) }}
+
+[Peer]
+PublicKey = {{ wireguard_public_key }}
+EndPoint = {{ wireguard_address }}:{{ wireguard_port }}
+{% if client.routes is defined %}
+AllowedIPs = {{ wireguard_network }}
+{% else %}
+AllowedIPs = {{ wireguard_network | ipsubnet(32, 1) }}
+{% endif %}
+{% for other_client in wireguard_clients %}
+{% if other_client.host_id != client.host_id and other_client.routes is defined %}
+AllowedIPs = {{ other_client.routes | join(", ") }}
+{% endif %}
+{% endfor %}
+PersistentKeepAlive = 25

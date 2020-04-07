@@ -1,0 +1,2 @@
+[server]
+tunnel ansible_host={{ wireguard_network | ipaddr(1) | ipaddr("address") }}

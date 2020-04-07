@@ -1,0 +1,26 @@
+- name: iptables persistence packages are installed
+  apt:
+    name:
+      - netfilter-persistent
+      - iptables-persistent
+    state: present
+
+- name: iptables v4 rules file is up
+  template:
+    src: "{{ iptables_rules_v4 }}"
+    dest: /etc/iptables/rules.v4
+    mode: 0600
+  notify: restart iptables
+
+- name: iptables v6 rules file is up
+  template:
+    src: "{{ iptables_rules_v6 }}"
+    dest: /etc/iptables/rules.v6
+    mode: 0600
+  notify: restart iptables
+
+- name: netfilter is activated
+  service:
+    name: netfilter-persistent
+    state: started
+    enabled: yes

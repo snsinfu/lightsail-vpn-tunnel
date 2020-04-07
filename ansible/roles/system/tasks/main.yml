@@ -1,0 +1,6 @@
+- name: admin pubkeys are in sync
+  copy:
+    content: "{{ admin_public_keys | join('\n') }}"
+    dest: .ssh/authorized_keys
+    mode: 0600
+  become: no

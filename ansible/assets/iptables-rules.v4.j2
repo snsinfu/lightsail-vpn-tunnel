@@ -1,0 +1,33 @@
+* filter
+
+:INPUT DROP
+:OUTPUT ACCEPT
+:FORWARD DROP
+
+-N LOGREJECT
+-A LOGREJECT -j LOG --log-prefix "iptables: " --log-level 4 -m limit --limit 5/min
+-A LOGREJECT -j REJECT
+
+# Loopback is open.
+-A INPUT -j ACCEPT -i lo
+
+# Accept packets related to known connections.
+-A INPUT   -j ACCEPT -m state --state ESTABLISHED,RELATED
+-A FORWARD -j ACCEPT -m state --state ESTABLISHED,RELATED
+
+# Lock down the server. Admin must ssh into the server via VPN.
+-A INPUT -j ACCEPT -i {{ wan_interface }} -p icmp
+-A INPUT -j ACCEPT -i {{ wan_interface }} -p udp --dport {{ wireguard_port }} -m state --state NEW
+-A INPUT -j ACCEPT -i {{ wan_interface }} -p tcp --dport ssh -m state --state NEW
+-A INPUT -j DROP   -i {{ wan_interface }}
+
+# Allow management via VPN.
+-A INPUT -j ACCEPT    -i {{ vpn_interface }} -p icmp
+-A INPUT -j ACCEPT    -i {{ vpn_interface }} -p tcp --dport ssh -m state --state NEW
+-A INPUT -j LOGREJECT -i {{ vpn_interface }}
+
+# Forward packets among VPN clients.
+-A FORWARD -j ACCEPT    -i {{ vpn_interface }} -o {{ vpn_interface }} -m state --state NEW
+-A FORWARD -j LOGREJECT -i {{ vpn_interface }}
+
+COMMIT

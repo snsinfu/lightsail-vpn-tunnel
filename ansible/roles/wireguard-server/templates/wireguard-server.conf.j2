@@ -1,0 +1,14 @@
+[Interface]
+PrivateKey = {{ wireguard_private_key }}
+ListenPort = {{ wireguard_port }}
+Address = {{ wireguard_network | ipaddr(1) }}
+
+{% for client in wireguard_clients %}
+[Peer] # {{ client.name }}
+PublicKey = {{ client.public_key }}
+AllowedIPs = {{ wireguard_network | ipsubnet(32, client.host_id) }}
+{% if client.routes is defined %}
+AllowedIPs = {{ client.routes | join(", ") }}
+{% endif %}
+
+{% endfor %}

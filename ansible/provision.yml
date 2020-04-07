@@ -1,0 +1,26 @@
+- hosts: tunnel
+  become: yes
+
+  tasks:
+    - include_role:
+        name: system
+
+    - include_role:
+        name: wireguard-server
+      vars:
+        wireguard_address: "{{ public_address }}"
+
+    - name: ansible inventory is updated to use wireguard
+      template:
+        src: assets/inventory-wireguard.j2
+        dest: inventory/_20-wireguard
+      connection: local
+      become: no
+
+    - include_role:
+        name: iptables
+      vars:
+        iptables_rules_v4: assets/iptables-rules.v4.j2
+        iptables_rules_v6: assets/iptables-rules.v6.j2
+        wan_interface: "{{ ansible_default_ipv4.interface }}"
+        vpn_interface: "{{ wireguard_interface }}"
