@@ -1,0 +1,5 @@
+*nat
+
+-A POSTROUTING -j SNAT -o {{ ansible_default_ipv4.interface }} --to {{ ansible_default_ipv4.address }}
+
+COMMIT
