@@ -35,4 +35,6 @@ END
 export DEBIAN_FRONTEND=noninteractive
 apt-get update -qy
 apt-get install -qy --no-install-recommends linux-image-amd64
-reboot
+
+# Wait 1 minute before rebooting to allow cloud-init to finish.
+shutdown -r +1
